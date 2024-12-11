@@ -25,6 +25,7 @@
                             <li><button class="dropdown-item" id="filterDate">By Date</button></li>
                             <li><button class="dropdown-item" id="filterAuthor">By Author</button></li>
                             <li><button class="dropdown-item" id="filterAlphabet">By Alphabet</button></li>
+                            <li><button class="dropdown-item" id="filterExpired">Expired First</button></li>
                         </ul>
                     </div>
                 </div>
@@ -305,6 +306,19 @@
 
             document.getElementById('filterAlphabet').addEventListener('click', function() {
                 cards.sort((a, b) => a.title.localeCompare(b.title));
+                renderCards(searchInput.value);
+            });
+
+            const currentDate = new Date().toISOString().split('T')[0];
+            document.getElementById('filterExpired').addEventListener('click', function () {
+                cards.sort((a, b) => {
+                    const isAExpired = a.reviewDate && a.reviewDate < currentDate;
+                    const isBExpired = b.reviewDate && b.reviewDate < currentDate;
+
+                    if (isAExpired && !isBExpired) return -1; // A просрочена, B нет
+                    if (!isAExpired && isBExpired) return 1;  // B просрочена, A нет
+                    return 0; // Обе либо просрочены, либо нет
+                });
                 renderCards(searchInput.value);
             });
 
