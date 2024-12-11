@@ -159,13 +159,32 @@
 
             function renderCards(filter = '') {
                 cardList.innerHTML = '';
+                const currentDate = new Date().toISOString().split('T')[0];
+
                 cards
                     .filter(card => card.title.toLowerCase().includes(filter.toLowerCase()))
                     .forEach(card => {
                         const cardElement = document.createElement('div');
-                        cardElement.className = 'p-3 rounded-4 border card-item';
-                        cardElement.textContent = card.title;
+                        cardElement.className = 'p-3 rounded-4 border card-item d-flex justify-content-between align-items-center';
                         cardElement.dataset.cardId = card.id;
+
+                        if (card.reviewDate && card.reviewDate < currentDate) {
+                            cardElement.classList.add('review-date-warning');
+                        }
+
+                        const titleElement = document.createElement('div');
+                        titleElement.textContent = card.title;
+                        titleElement.className = 'card-title';
+
+                        const datesElement = document.createElement('div');
+                        datesElement.className = 'card-dates text-muted';
+                        datesElement.innerHTML = `
+                            <small>Created: ${card.createdAt}</small><br>
+                            <small>Review: ${card.reviewDate || 'N/A'}</small>
+                        `;
+
+                        cardElement.appendChild(titleElement);
+                        cardElement.appendChild(datesElement);
                         cardList.appendChild(cardElement);
                     });
             }
