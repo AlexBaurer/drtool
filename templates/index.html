@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FastAPI Project</title>
+    <!-- Подключение CSS -->
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+</head>
+<body>
+    <div id="app">
+    <div class="container-fluid">
+        <div class="row vh-100">
+            <!-- Левая панель -->
+            <div class="col-md-4 col-lg-3 p-3 border-end">
+                <div class="input-group mb-3">
+                    <input type="text" id="searchInput" class="form-control rounded-pill" placeholder="Search..." aria-label="Search">
+                    <div class="btn-group">
+                        <button class="btn btn-outline-secondary rounded-circle ms-2 dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="width: 38px; height: 38px;" aria-label="Filter">
+                            <i class="bi bi-funnel"></i>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><button class="dropdown-item" id="filterDate">By Date</button></li>
+                            <li><button class="dropdown-item" id="filterAuthor">By Author</button></li>
+                            <li><button class="dropdown-item" id="filterAlphabet">By Alphabet</button></li>
+                            <li><button class="dropdown-item" id="filterOverdue">Overdue First</button></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="d-flex flex-column gap-3 mb-3" id="cardList">
+                    {% for card in cards %}
+                    <div class="p-3 rounded-4 border card-item d-flex justify-content-between align-items-center
+                        {% if card.reviewDate < current_date %} review-date-warning {% endif %}"
+                        data-card-id="{{ card.id }}">
+                        <div>{{ card.title }}</div>
+                        <div class="text-muted">
+                            <small>Created: {{ card.createdAt }}</small><br>
+                            <small>Review: {{ card.reviewDate or 'N/A' }}</small>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                <button class="btn btn-outline-primary rounded-circle" style="width: 38px; height: 38px;" aria-label="New Card" data-bs-toggle="modal" data-bs-target="#newCardModal">
+                    <i class="bi bi-plus"></i>
+                </button>
+            </div>
+            <!-- Правая панель -->
+            <div class="col-md-8 col-lg-9 p-3 d-flex flex-column">
+                <div class="p-3 rounded-4 mb-3 border">
+                    <input type="text" id="editableCardTitle" class="form-control" disabled>
+                </div>
+                <div class="p-3 rounded-4 mb-3 flex-grow-1 border">
+                    <textarea id="editableCardContent" class="form-control mb-3" rows="10" disabled></textarea>
+                    <div class="p-3 rounded-4 border">
+                        <small id="dateReview">Here will be date to re done</small>
+                        <button class="btn btn-outline-secondary btn-sm" id="editReviewDate">Edit</button>
+                    </div>
+                    <button class="btn btn-primary mt-3" id="saveCardButton" disabled>Save Card</button>
+                    <button class="btn btn-outline-info mt-3 ms-2" id="viewLogButton">View Log</button>
+                </div>
+                <div class="p-3 rounded-4 border">
+                    <small id="cardMetadata">Card metadata will appear here</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Подключение JavaScript -->
+    <script type="text/javascript" src="/static/js/app.js"></script>
+</body>
+</html>
