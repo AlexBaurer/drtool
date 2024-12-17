@@ -1,21 +1,59 @@
-from fastapi import FastAPI, Request
-from fastapi.responses import HTMLResponse
-from fastapi.templating import Jinja2Templates
+from fastapi import FastAPI, HTTPException, Request
+from pydantic import BaseModel
+from typing import List
 from fastapi.staticfiles import StaticFiles
-from datetime import date
+from fastapi.templating import Jinja2Templates
+from fastapi.responses import HTMLResponse
+from datetime import date, datetime
 
 app = FastAPI()
 
-# Указываем папки для шаблонов и статических файлов
-templates = Jinja2Templates(directory="templates")
+
+
 app.mount("/static", StaticFiles(directory="static"), name="static")
+
+# Инициализация Jinja2
+templates = Jinja2Templates(directory="templates")
+
+class NewCard(BaseModel):
+    title: str
+    content: str
+    date_review: str
+
+class Card(NewCard):
+    id: int
+    created_at: datetime
+    updated_at: datetime
+    author: str
+
+# Данные временно хранятся в памяти
+cards = [
+    Card(id=0, title="T1", content="c1", created_at=datetime.now(), updated_at=datetime.now(), date_review="2023-12-15", author="au1"),
+]
+
+@app.get("/api/cards", response_model=List[Card])
+async def get_cards():
+    return cards
+
+@app.post("/api/cards", response_model=Card)
+async def create_card(card: NewCard):
+    card = Card(title=card.title, content=card.content, date_review=card.date_review,
+         id=max(c.id for c in cards) + 1 if cards else 1, created_at=datetime.now(),
+         updated_at=datetime.now(), author='kek')
+    cards.append(card)
+    return card
+
+@app.put("/api/cards/{card_id}")
+async def update_card(card_id: int, updated_card: Card):
+    for idx, card in enumerate(cards):
+        if card.id == card_id:
+            cards[idx].title = updated_card.title
+            cards[idx].content = updated_card.content
+            cards[idx].date_review = updated_card.date_review
+            cards[idx].updated_at = datetime.now()
+            return updated_card
+    raise HTTPException(status_code=404, detail="Card not found")
 
 @app.get("/", response_class=HTMLResponse)
 async def read_root(request: Request):
-    # Данные для карточек
-    cards = [
-        {"id": 1, "title": "Card 1", "content": "Content for card 1", "createdAt": "2023-12-10", "reviewDate": "2023-12-09"},
-        {"id": 2, "title": "Card 2", "content": "Content for card 2", "createdAt": "2023-12-11", "reviewDate": "2023-12-12"}
-    ]
-    current_date = str(date.today())
-    return templates.TemplateResponse("index.html", {"request": request, "cards": cards, "current_date": current_date})
+    return templates.TemplateResponse("index.html", {"request": request})
