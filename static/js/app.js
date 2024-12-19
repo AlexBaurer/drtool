@@ -14,19 +14,40 @@ document.addEventListener('DOMContentLoaded', async function () {
     const newCardReviewDate = document.getElementById("newCardReviewDate");
     const editReviewDate = document.getElementById('editReviewDate');
     const rightPanel = document.getElementById("rightPanel");
-    const modalWindow = document.getElementById("modalWindow");
+    const logWindow = document.getElementById("logWindow");
 
-    // Функция для показа модального окна
-    const showModal = () => {
-        modalWindow.classList.add("show");
+    let currentCard = null;
+
+    const showLog = () => {
+        logWindow.classList.add("show");
+        try {
+            // Запрос данных с бэкенда
+            const response = fetch('/api/logs');
+            if (!response.ok) throw new Error(`Ошибка: ${response.statusText}`);
+
+            const data = response.json();
+            renderLog(data);
+        } catch (error) {
+            logContent.innerHTML = `<p class="text-danger">Не удалось загрузить данные: ${error.message}</p>`;
+        }
+    };
+
+    const renderLog = (data) => {
+    //TODO stop here
+        if (currentCard) {
+            if (currentCard.id = card.id) {
+                logContent.innerHTML = `
+                    <h3>${data.title}</h3>
+                    <p>${data.content}</p>
+                `;
+            }
+        }
     };
 
     // Функция для возврата к панели
-    const goBack = () => {
-        modalWindow.classList.remove("show");
+    const goBackLog = () => {
+        logWindow.classList.remove("show");
     };
-
-    let currentCard = null;
 
     async function fetchCards() {
         const response = await fetch('/api/cards');
@@ -186,9 +207,9 @@ document.addEventListener('DOMContentLoaded', async function () {
 
 
 
-    viewLogButton.addEventListener("click", showModal);
+    viewLogButton.addEventListener("click", showLog);
 
-    backLogButton.addEventListener("click", goBack);
+    backLogButton.addEventListener("click", goBackLog);
 
 //    // Фильтрация карточек по просроченным
 //    document.getElementById('filterOverdue').addEventListener('click', function() {

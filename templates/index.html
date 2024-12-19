@@ -103,21 +103,6 @@
         </div>
     </div>
 
-    <!-- Log Modal -->
-    <div class="modal fade" id="logModal" tabindex="-1" aria-labelledby="logModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="logModalLabel">Card Logs</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body" id="logModalBody">
-                    <!-- Logs will be dynamically added here -->
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- Date Picker Modal -->
     <div class="modal fade" id="datePickerModal" tabindex="-1" aria-labelledby="datePickerModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
@@ -137,10 +122,11 @@
         </div>
     </div>
 
-    <!-- Скрытое окно -->
-    <div id="modalWindow" class="hidden-panel p-3 rounded-4 border bg-light">
-        <h3>Modal Content</h3>
-        <p>This is the modal window. You can add any content here.</p>
+    <!-- Log modal -->
+    <div id="logWindow" class="hidden-log-panel p-3 rounded-4 border bg-light">
+        <div id="logContent">
+            <h3>Loading...</h3> <!-- Плейсхолдер до загрузки контента -->
+        </div>
         <button id="backLogButton" class="btn btn-outline-secondary">Go Back</button>
     </div>
 

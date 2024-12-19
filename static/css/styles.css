@@ -128,11 +128,7 @@ body {
     background-color: #adb5bd;
 }
 
-.d-none {
-    display: none !important;
-}
-
-.hidden-panel {
+.hidden-log-panel {
     position: fixed;
     top: 0;
     right: -100%; /* Полностью скрыта за экраном */
@@ -145,7 +141,7 @@ body {
 }
 
 /* Видимая панель */
-.hidden-panel.show {
+.hidden-log-panel.show {
     right: 0; /* Показываем панель, выдвигая её */
 }
 

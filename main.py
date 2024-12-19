@@ -26,10 +26,20 @@ class Card(NewCard):
     updated_at: datetime
     author: str
 
+# class Log(Card):
+#     def __init__(self):
+#         self.log = []
+#
+#     def log_add(self):
+#         self.log.append()
+
+
 # Данные временно хранятся в памяти
 cards = [
     Card(id=0, title="T1", content="c1", created_at=datetime.now(), updated_at=datetime.now(), date_review="2023-12-15", author="au1"),
 ]
+
+logs = []
 
 @app.get("/api/cards", response_model=List[Card])
 async def get_cards():
@@ -41,6 +51,7 @@ async def create_card(card: NewCard):
          id=max(c.id for c in cards) + 1 if cards else 1, created_at=datetime.now(),
          updated_at=datetime.now(), author='kek')
     cards.append(card)
+    logs.append(card)
     return card
 
 @app.put("/api/cards/{card_id}")
@@ -51,9 +62,14 @@ async def update_card(card_id: int, updated_card: Card):
             cards[idx].content = updated_card.content
             cards[idx].date_review = updated_card.date_review
             cards[idx].updated_at = datetime.now()
+            logs.append(updated_card)
             return updated_card
     raise HTTPException(status_code=404, detail="Card not found")
 
 @app.get("/", response_class=HTMLResponse)
 async def read_root(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
+
+@app.get("/api/logs", response_model=List[Card])
+async def get_logs():
+    return logs
