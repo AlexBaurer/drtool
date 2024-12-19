@@ -48,7 +48,7 @@
                 </button>
             </div>
             <!-- Правая панель -->
-            <div class="col-md-8 col-lg-9 p-3 d-flex flex-column">
+            <div id="rightPanel" class="col-md-8 col-lg-9 p-3 d-flex flex-column">
                 <div class="p-3 rounded-4 mb-3 border">
                     <input type="text" id="editableCardTitle" class="form-control" disabled>
                 </div>
@@ -135,6 +135,13 @@
                 </div>
             </div>
         </div>
+    </div>
+
+    <!-- Скрытое окно -->
+    <div id="modalWindow" class="hidden-panel p-3 rounded-4 border bg-light">
+        <h3>Modal Content</h3>
+        <p>This is the modal window. You can add any content here.</p>
+        <button id="backLogButton" class="btn btn-outline-secondary">Go Back</button>
     </div>
 
     <!-- Bootstrap JS -->

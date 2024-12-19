@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     const editableCardContent = document.getElementById('editableCardContent');
     const saveCardButton = document.getElementById('saveCardButton');
     const viewLogButton = document.getElementById('viewLogButton');
+    const backLogButton = document.getElementById("backLogButton");
     const cardMetadata = document.getElementById('cardMetadata');
     const dateReviewField = document.getElementById('dateReview');
     const saveNewCardButton = document.getElementById('saveNewCard');
@@ -12,6 +13,18 @@ document.addEventListener('DOMContentLoaded', async function () {
     const newCardContentInput = document.getElementById('newCardContent');
     const newCardReviewDate = document.getElementById("newCardReviewDate");
     const editReviewDate = document.getElementById('editReviewDate');
+    const rightPanel = document.getElementById("rightPanel");
+    const modalWindow = document.getElementById("modalWindow");
+
+    // Функция для показа модального окна
+    const showModal = () => {
+        modalWindow.classList.add("show");
+    };
+
+    // Функция для возврата к панели
+    const goBack = () => {
+        modalWindow.classList.remove("show");
+    };
 
     let currentCard = null;
 
@@ -170,6 +183,12 @@ document.addEventListener('DOMContentLoaded', async function () {
         }
 
     });
+
+
+
+    viewLogButton.addEventListener("click", showModal);
+
+    backLogButton.addEventListener("click", goBack);
 
 //    // Фильтрация карточек по просроченным
 //    document.getElementById('filterOverdue').addEventListener('click', function() {

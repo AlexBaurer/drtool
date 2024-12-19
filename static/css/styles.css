@@ -127,3 +127,25 @@ body {
 #cardList::-webkit-scrollbar-thumb:hover {
     background-color: #adb5bd;
 }
+
+.d-none {
+    display: none !important;
+}
+
+.hidden-panel {
+    position: fixed;
+    top: 0;
+    right: -100%; /* Полностью скрыта за экраном */
+    width: 75%; /* Ширина панели */
+    height: 100%; /* На всю высоту экрана */
+    background-color: #f8f9fa;
+    box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+    transition: right 0.3s ease; /* Анимация появления */
+    z-index: 1050; /* Поверх других элементов */
+}
+
+/* Видимая панель */
+.hidden-panel.show {
+    right: 0; /* Показываем панель, выдвигая её */
+}
+
