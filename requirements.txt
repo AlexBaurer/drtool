@@ -3,3 +3,8 @@ uvicorn
 jinja2
 ruff
 pytest
+pydantic
+alembic
+asyncpg
+sqlalchemy
+pydantic-settings

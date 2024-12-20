@@ -5,33 +5,30 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 from datetime import date, datetime
+from app.cards.models import Card
 
 app = FastAPI()
 
-
+class NewCard(BaseModel):
+    title: str
+    content: str
+    date_review: date
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # Инициализация Jinja2
 templates = Jinja2Templates(directory="templates")
 
-class NewCard(BaseModel):
-    title: str
-    content: str
-    date_review: str
-
-class Card(NewCard):
-    id: int
-    created_at: datetime
-    updated_at: datetime
-    author: str
-
-# class Log(Card):
-#     def __init__(self):
-#         self.log = []
+# class NewCard(BaseModel):
+#     title: str
+#     content: str
+#     date_review: str
 #
-#     def log_add(self):
-#         self.log.append()
+# class Card(NewCard):
+#     id: int
+#     created_at: datetime
+#     updated_at: datetime
+#     author: str
 
 
 # Данные временно хранятся в памяти
@@ -48,7 +45,7 @@ async def get_cards():
 @app.post("/api/cards", response_model=Card)
 async def create_card(card: NewCard):
     card = Card(title=card.title, content=card.content, date_review=card.date_review,
-         id=max(c.id for c in cards) + 1 if cards else 1, created_at=datetime.now(),
+         id=max(c.id for c in cards) + 1 if cards else 0, created_at=datetime.now(),
          updated_at=datetime.now(), author='kek')
     cards.append(card)
     logs.append(card)
