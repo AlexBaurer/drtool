@@ -1,35 +1,33 @@
 from fastapi import FastAPI, HTTPException, Request
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from typing import List
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 from datetime import date, datetime
-from app.cards.models import Card
+from sqlalchemy.orm import Session
+from app.cards.models import CardOrm
 
 app = FastAPI()
 
 class NewCard(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     title: str
     content: str
-    date_review: date
+    date_review: str
+
+class Card(NewCard):
+    id: int
+    created_at: datetime
+    updated_at: datetime
+    author: str
+
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # Инициализация Jinja2
 templates = Jinja2Templates(directory="templates")
-
-# class NewCard(BaseModel):
-#     title: str
-#     content: str
-#     date_review: str
-#
-# class Card(NewCard):
-#     id: int
-#     created_at: datetime
-#     updated_at: datetime
-#     author: str
-
 
 # Данные временно хранятся в памяти
 cards = [
@@ -39,8 +37,8 @@ cards = [
 logs = []
 
 @app.get("/api/cards", response_model=List[Card])
-async def get_cards():
-    return cards
+async def get_cards(db: Session):
+    return db.query(CardOrm).all()
 
 @app.post("/api/cards", response_model=Card)
 async def create_card(card: NewCard):

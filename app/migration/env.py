@@ -4,7 +4,7 @@ from os.path import dirname, abspath
 sys.path.insert(0, dirname(dirname(abspath(__file__))))
 
 from app.db import DATABASE_URL, Base
-from app.cards.models import Card
+from app.cards.models import CardOrm
 
 
 
