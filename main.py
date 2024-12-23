@@ -6,7 +6,9 @@ from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 from datetime import date, datetime
 from sqlalchemy.orm import Session
+from sqlalchemy.future import select
 from app.cards.models import CardOrm
+from app.db import async_session_maker
 
 app = FastAPI()
 
@@ -15,7 +17,7 @@ class NewCard(BaseModel):
 
     title: str
     content: str
-    date_review: str
+    date_review: datetime
 
 class Card(NewCard):
     id: int
@@ -30,15 +32,30 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 
 # Данные временно хранятся в памяти
-cards = [
-    Card(id=0, title="T1", content="c1", created_at=datetime.now(), updated_at=datetime.now(), date_review="2023-12-15", author="au1"),
-]
+# cards = [
+#     Card(id=0, title="T1", content="c1", created_at=datetime.now(), updated_at=datetime.now(), date_review=datetime.now(), author="au1"),
+# ]
 
 logs = []
 
+async def get_all_cards_from_db():
+    global cards
+    try:
+        async with async_session_maker() as session:
+            q = select(CardOrm)
+            res = await session.execute(q)
+            curr = res.scalars()
+            cards = [i for i in curr]
+        return cards
+    except:
+        pass
+
+
+
 @app.get("/api/cards", response_model=List[Card])
-async def get_cards(db: Session):
-    return db.query(CardOrm).all()
+async def get_cards():
+    await get_all_cards_from_db()
+    return cards
 
 @app.post("/api/cards", response_model=Card)
 async def create_card(card: NewCard):
