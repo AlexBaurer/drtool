@@ -5,8 +5,8 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 from datetime import date, datetime
-from sqlalchemy.orm import Session
 from sqlalchemy.future import select
+from sqlalchemy.exc import SQLAlchemyError
 from app.cards.models import CardOrm
 from app.db import async_session_maker
 
@@ -20,10 +20,13 @@ class NewCard(BaseModel):
     date_review: datetime
 
 class Card(NewCard):
-    id: int
+    # id: int
     created_at: datetime
     updated_at: datetime
     author: str
+
+    class Config:
+        orm_mode=True
 
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -51,7 +54,6 @@ async def get_all_cards_from_db():
         pass
 
 
-
 @app.get("/api/cards", response_model=List[Card])
 async def get_cards():
     await get_all_cards_from_db()
@@ -59,12 +61,17 @@ async def get_cards():
 
 @app.post("/api/cards", response_model=Card)
 async def create_card(card: NewCard):
-    card = Card(title=card.title, content=card.content, date_review=card.date_review,
-         id=max(c.id for c in cards) + 1 if cards else 0, created_at=datetime.now(),
-         updated_at=datetime.now(), author='kek')
-    cards.append(card)
+    card = CardOrm(title=card.title, content=card.content, date_review=card.date_review,
+         created_at=datetime.now(), updated_at=datetime.now(), author='kek')
+    try:
+        async with async_session_maker() as session:
+            session.add(card)
+            await session.commit()
+    except SQLAlchemyError as e:
+        error = str(e.__cause__)
+        print(error)
     logs.append(card)
-    return card
+    return Card.from_orm(card)
 
 @app.put("/api/cards/{card_id}")
 async def update_card(card_id: int, updated_card: Card):
