@@ -20,7 +20,7 @@ class NewCard(BaseModel):
     date_review: datetime
 
 class Card(NewCard):
-    # id: int
+    id: int
     created_at: datetime
     updated_at: datetime
     author: str
@@ -53,6 +53,25 @@ async def get_all_cards_from_db():
     except:
         pass
 
+async def get_card_by_id(card_id):
+    try:
+        async with async_session_maker() as session:
+            q = select(CardOrm).filter_by(id=card_id)
+            res = await session.execute(q)
+        return res.scalar_one_or_none()
+    except:
+        pass
+
+async def add_card(card):
+    try:
+        async with async_session_maker() as session:
+            session.add(card)
+            await session.commit()
+    except SQLAlchemyError as e:
+        error = str(e.__cause__)
+        print(error)
+    return Card.from_orm(card)
+
 
 @app.get("/api/cards", response_model=List[Card])
 async def get_cards():
@@ -63,27 +82,24 @@ async def get_cards():
 async def create_card(card: NewCard):
     card = CardOrm(title=card.title, content=card.content, date_review=card.date_review,
          created_at=datetime.now(), updated_at=datetime.now(), author='kek')
-    try:
-        async with async_session_maker() as session:
-            session.add(card)
-            await session.commit()
-    except SQLAlchemyError as e:
-        error = str(e.__cause__)
-        print(error)
+    await add_card(card)
     logs.append(card)
     return Card.from_orm(card)
 
 @app.put("/api/cards/{card_id}")
 async def update_card(card_id: int, updated_card: Card):
-    for idx, card in enumerate(cards):
-        if card.id == card_id:
-            cards[idx].title = updated_card.title
-            cards[idx].content = updated_card.content
-            cards[idx].date_review = updated_card.date_review
-            cards[idx].updated_at = datetime.now()
-            logs.append(updated_card)
-            return updated_card
+    print(card_id)
+    card = await get_card_by_id(card_id)
+    print(card)
+    if card.id == card_id:
+        card.title = updated_card.title
+        card.content = updated_card.content
+        card.date_review = updated_card.date_review
+        card.updated_at = updated_card.updated_at
+        await add_card(card)
+        return updated_card
     raise HTTPException(status_code=404, detail="Card not found")
+
 
 @app.get("/", response_class=HTMLResponse)
 async def read_root(request: Request):
