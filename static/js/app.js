@@ -94,6 +94,12 @@ document.addEventListener('DOMContentLoaded', async function () {
         }
     }
 
+    function dateCutter(dateToConv){
+        const convDateObj = new Date(dateToConv);
+        const convDateRes = convDateObj.toISOString().split("T")[0];
+        return convDateRes;
+    }
+
     async function renderCards(filter = '') {
         const cards = await fetchCards();
         console.log('API responseRC:', await fetch('/api/cards').then(res => res.json()));
@@ -103,8 +109,12 @@ document.addEventListener('DOMContentLoaded', async function () {
             .filter(card => card.title.toLowerCase().includes(filter.toLowerCase()))
             .forEach(card => {
                 const cardElement = document.createElement('div');
-                const formattedDateObj = new Date(card.created_at);
-                const formattedDate = formattedDateObj.toISOString().split("T")[0];
+//                const formattedDateCreatedAtObj = new Date(card.created_at);
+//                const formattedDateCreatedAt = formattedDateCreatedAtObj.toISOString().split("T")[0];
+                const formattedDateCreatedAt = dateCutter(card.created_at);
+//                const formattedDateReviewObj = new Date(card.date_review);
+//                const formattedDateReview = formattedDateReviewObj.toISOString().split("T")[0];
+                const formattedDateReview = dateCutter(card.date_review);
 //                cardElement.textContent = `${card.title} (Created: ${card.created_at}, Review: ${card.date_review})`;
                 cardElement.className = `p-3 rounded-4 border card-item d-flex justify-content-between align-items-center
                  ${new Date(card.date_review) < new Date() ? 'review-date-warning' : ''}`;
@@ -113,8 +123,8 @@ document.addEventListener('DOMContentLoaded', async function () {
                 cardElement.innerHTML = `
                 <div>${card.title}</div>
                 <div class="text-muted">
-                    <small>Created: ${formattedDate}</small><br>
-                    <small>Review: ${card.date_review || 'N/A'}</small>
+                    <small>Created: ${formattedDateCreatedAt}</small><br>
+                    <small>Review: ${formattedDateReview || 'N/A'}</small>
                 </div>
                 `;
 
@@ -129,14 +139,16 @@ document.addEventListener('DOMContentLoaded', async function () {
     }
 
     function selectCard(card) {
+        const formattedDateCreatedAt = dateCutter(card.created_at);
+        const formattedDateUpdatedAt = dateCutter(card.updated_at);
         currentCard = card;
         editableCardTitle.value = card.title;
         editableCardContent.value = card.content;
-        dateReviewField.textContent = card.date_review;
+        dateReviewField.textContent = dateCutter(card.date_review);
         editableCardTitle.disabled = false;
         editableCardContent.disabled = false;
         saveCardButton.disabled = false;
-        cardMetadata.textContent = `Created: ${card.created_at} | Last Updated: ${card.updated_at} | Author: ${card.author}`;
+        cardMetadata.textContent = `Created: ${formattedDateCreatedAt} | Last Updated: ${formattedDateUpdatedAt} | Author: ${card.author}`;
     }
 
     saveCardButton.addEventListener('click', async function () {
