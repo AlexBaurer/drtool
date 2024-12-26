@@ -18,17 +18,26 @@
             <div class="col-md-4 col-lg-3 p-3 border-end">
                 <div class="input-group mb-3">
                     <input type="text" id="searchInput" class="form-control rounded-pill" placeholder="Search..." aria-label="Search">
-                    <div class="btn-group">
-                        <button class="btn btn-outline-secondary rounded-circle ms-2 dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="width: 38px; height: 38px;" aria-label="Filter">
-                            <i class="bi bi-funnel"></i>
+                    <div class="btn-group ms-2">
+                    <!-- Кнопка Sort -->
+                        <button class="btn btn-outline-secondary" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Sort">
+                            Sort
                         </button>
                         <ul class="dropdown-menu">
-                            <li><button class="dropdown-item" id="filterDate">By Date</button></li>
-                            <li><button class="dropdown-item" id="filterAuthor">By Author</button></li>
-                            <li><button class="dropdown-item" id="filterAlphabet">By Alphabet</button></li>
-                            <li><button class="dropdown-item" id="filterOverdue">Overdue First</button></li>
+                            <li><button class="dropdown-item" id="sortByDate">By Date</button></li>
+                            <li><button class="dropdown-item" id="sortByAuthor">By Author</button></li>
+                            <li><button class="dropdown-item" id="sortByAlphabet">By Alphabet</button></li>
+                            <li><button class="dropdown-item" id="sortByOverdue">Overdue First</button></li>
                         </ul>
                     </div>
+                    </div>
+                <div class="mb-3">
+                    <div class="input-group mb-2">
+                        <input type="date" id="startDateFilter" class="form-control" placeholder="Start Date" aria-label="Start Date">
+                        <input type="date" id="endDateFilter" class="form-control" placeholder="End Date" aria-label="End Date">
+                    </div>
+                    <input type="text" id="authorFilter" class="form-control mb-2" placeholder="Author Name" aria-label="Author Name">
+                    <button class="btn btn-primary w-100" id="applyFiltersButton" aria-label="Apply Filters">Apply Filters</button>
                 </div>
                 <div class="d-flex flex-column gap-3 mb-3" id="cardList">
                     {% for card in cards %}
