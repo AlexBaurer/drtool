@@ -141,7 +141,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         currentCard = card;
         editableCardTitle.value = card.title;
         editableCardContent.value = card.content;
-        dateReviewField.textContent = dateCutter(card.date_review);
+        dateReviewField.textContent = `Review date: ${dateCutter(card.date_review)}`;
         editableCardTitle.disabled = false;
         editableCardContent.disabled = false;
         saveCardButton.disabled = false;
@@ -218,9 +218,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         event.preventDefault();
 
         const formData = new FormData(filterForm);
-        console.log('form data', formData);
         const params = new URLSearchParams(formData);
-        console.log('parametri', params);
 
         const url = `/api/cards?${params.toString()}`;
         console.log('url', url);
