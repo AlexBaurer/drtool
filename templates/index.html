@@ -37,7 +37,10 @@
                         <input type="date" id="endDateFilter" name='to_date' class="form-control" placeholder="End Date" value="{{ to_date or '' }}" aria-label="End Date">
                     </div>
                     <input type="text" id="authorFilter" name="author" class="form-control mb-2" placeholder="Author Name" value="{{ author or '' }}" aria-label="Author Name">
-                    <button type="submit" class="btn btn-primary w-100" aria-label="Apply Filters">Apply Filters</button>
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary w-100" aria-label="Apply Filters">Apply Filters</button>
+                        <button type="reset" id="resetFilters" class="btn btn-secondary w-100" aria-label="Reset Filters">Reset Filters</button>
+                    </div>
                 </form>
                 <div class="d-flex flex-column gap-3 mb-3" id="cardList">
                     {% for card in cards %}

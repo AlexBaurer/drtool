@@ -214,55 +214,59 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     });
 
-        filterForm.addEventListener('submit', async (event) => {
-            event.preventDefault();
+    filterForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
 
-            const formData = new FormData(filterForm);
-            console.log('form data', formData);
-            const params = new URLSearchParams(formData);
-            console.log('parametri', params);
+        const formData = new FormData(filterForm);
+        console.log('form data', formData);
+        const params = new URLSearchParams(formData);
+        console.log('parametri', params);
 
-            const url = `/api/cards?${params.toString()}`;
-            console.log('url', url);
-            window.history.pushState(null, '', url);
+        const url = `/api/cards?${params.toString()}`;
+        console.log('url', url);
+        window.history.pushState(null, '', url);
 
-            try {
-                const response = await fetch(url);
-                if (!response.ok) {
-                    throw new Error('Failed to fetch filtered cards');
-                }
-
-                const cards = await response.json();
-
-                cardList.innerHTML = '';
-                cards
-                    .filter(card => card.title.toLowerCase())
-                    .forEach(card => {
-                        const cardElement = document.createElement('div');
-                        const formattedDateCreatedAt = dateCutter(card.created_at);
-                        const formattedDateReview = dateCutter(card.date_review);
-                        cardElement.className = `p-3 rounded-4 border card-item d-flex justify-content-between align-items-center
-                         ${new Date(card.date_review) < new Date() ? 'review-date-warning' : ''}`;
-                        cardElement.dataset.cardId = card.id;
-
-                        cardElement.innerHTML = `
-                        <div>${card.title}</div>
-                        <div class="text-muted">
-                            <small>Created: ${formattedDateCreatedAt}</small><br>
-                            <small>Review: ${formattedDateReview || 'N/A'}</small>
-                        </div>
-                        `;
-
-                        cardList.appendChild(cardElement);
-
-                        cardElement.addEventListener('click', () => selectCard(card));
-                    });
-            } catch (error) {
-                console.error('Error:', error);
-                alert('Failed to apply filters');
+        try {
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error('Failed to fetch filtered cards');
             }
-        });
 
+            const cards = await response.json();
+
+            cardList.innerHTML = '';
+            cards
+                .filter(card => card.title.toLowerCase())
+                .forEach(card => {
+                    const cardElement = document.createElement('div');
+                    const formattedDateCreatedAt = dateCutter(card.created_at);
+                    const formattedDateReview = dateCutter(card.date_review);
+                    cardElement.className = `p-3 rounded-4 border card-item d-flex justify-content-between align-items-center
+                     ${new Date(card.date_review) < new Date() ? 'review-date-warning' : ''}`;
+                    cardElement.dataset.cardId = card.id;
+
+                    cardElement.innerHTML = `
+                    <div>${card.title}</div>
+                    <div class="text-muted">
+                        <small>Created: ${formattedDateCreatedAt}</small><br>
+                        <small>Review: ${formattedDateReview || 'N/A'}</small>
+                    </div>
+                    `;
+
+                    cardList.appendChild(cardElement);
+
+                    cardElement.addEventListener('click', () => selectCard(card));
+                });
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Failed to apply filters');
+        }
+    });
+
+    filterForm.addEventListener('reset', () => {
+        window.history.pushState(null, '', '/');
+        renderCards();
+    });
 
     viewLogButton.addEventListener("click", showLog);
 
