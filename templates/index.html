@@ -31,14 +31,14 @@
                         </ul>
                     </div>
                     </div>
-                <div class="mb-3">
+                <form id="filterForm" class="mb-3">
                     <div class="input-group mb-2">
-                        <input type="date" id="startDateFilter" class="form-control" placeholder="Start Date" aria-label="Start Date">
-                        <input type="date" id="endDateFilter" class="form-control" placeholder="End Date" aria-label="End Date">
+                        <input type="date" id="startDateFilter" name='from_date' class="form-control" placeholder="Start Date" value="{{ from_date or '' }}" aria-label="Start Date">
+                        <input type="date" id="endDateFilter" name='to_date' class="form-control" placeholder="End Date" value="{{ to_date or '' }}" aria-label="End Date">
                     </div>
-                    <input type="text" id="authorFilter" class="form-control mb-2" placeholder="Author Name" aria-label="Author Name">
-                    <button class="btn btn-primary w-100" id="applyFiltersButton" aria-label="Apply Filters">Apply Filters</button>
-                </div>
+                    <input type="text" id="authorFilter" name="author" class="form-control mb-2" placeholder="Author Name" value="{{ author or '' }}" aria-label="Author Name">
+                    <button type="submit" class="btn btn-primary w-100" aria-label="Apply Filters">Apply Filters</button>
+                </form>
                 <div class="d-flex flex-column gap-3 mb-3" id="cardList">
                     {% for card in cards %}
                     <div class="p-3 rounded-4 border card-item d-flex justify-content-between align-items-center

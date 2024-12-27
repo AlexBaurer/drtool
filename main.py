@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException, Request, Query
 from pydantic import BaseModel, ConfigDict
 from typing import List
 from fastapi.staticfiles import StaticFiles
@@ -73,10 +73,10 @@ async def add_card(card):
     return Card.from_orm(card)
 
 
-@app.get("/api/cards", response_model=List[Card])
-async def get_cards():
-    await get_all_cards_from_db()
-    return cards
+# @app.get("/api/cards", response_model=List[Card])
+# async def get_cards():
+#     await get_all_cards_from_db()
+#     return cards
 
 @app.post("/api/cards", response_model=Card)
 async def create_card(card: NewCard):
@@ -108,3 +108,31 @@ async def read_root(request: Request):
 @app.get("/api/logs", response_model=List[Card])
 async def get_logs():
     return logs
+
+@app.get("/api/cards", response_model=List[Card])
+async def filter_cards(
+    request: Request,
+    from_date: str | None = Query(None, alias="from_date"),
+    to_date: str | None = Query(None, alias="to_date"),
+    author: str | None = Query(None),
+):
+
+    # print('fd',from_date,'tod', to_date, 'a',author)
+    async with async_session_maker() as session:
+        query = select(CardOrm)
+        if from_date:
+            from_date = datetime.strptime(from_date, "%Y-%m-%d").date()
+            query = query.where(CardOrm.date_review >= from_date)
+        if to_date:
+            to_date = datetime.strptime(to_date, "%Y-%m-%d").date()
+            query = query.where(CardOrm.date_review <= to_date)
+        if author:
+            query = query.where(CardOrm.author.ilike(f"%{author}%"))
+
+        print(query)
+
+        result = await session.execute(query)
+        f_cards = result.scalars()
+        filtered_cards = [i for i in f_cards]
+
+    return filtered_cards
