@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     const newCardContentInput = document.getElementById('newCardContent');
     const newCardReviewDate = document.getElementById("newCardReviewDate");
     const editReviewDate = document.getElementById('editReviewDate');
+    const saveReviewDate = document.getElementById('saveReviewDate');
     const rightPanel = document.getElementById("rightPanel");
     const logWindow = document.getElementById("logWindow");
 
@@ -174,45 +175,29 @@ document.addEventListener('DOMContentLoaded', async function () {
         renderCards(searchInput.value);
     });
 
-    editReviewDate.addEventListener('click', async function () {
+    saveReviewDate.addEventListener('click', async function(){
         if (!currentCard) {
             alert('No card selected to edit.');
             return;
         }
 
-        const newReviewDate = prompt('Enter a new review date (YYYY-MM-DD):', currentCard.reviewDate);
-        if (newReviewDate) {
-            // Проверяем формат даты
-            const isValidDate = /^\d{4}-\d{2}-\d{2}$/.test(newReviewDate);
-            if (!isValidDate) {
-                alert('Invalid date format. Please use YYYY-MM-DD.');
-                return;
-            }
+        const reviewDateInput = document.getElementById('reviewDateInput');
+        const newReviewDate = reviewDateInput.value;
 
-            const oldReviewDate = currentCard.reviewDate;
-            currentCard.reviewDate = newReviewDate;
-
-//            if (!currentCard.logs) {
-//                currentCard.logs = [];
-//            }
-//
-//            // Добавляем запись в лог о смене даты пересмотра
-//            currentCard.logs.push({
-//                timestamp: new Date().toISOString(),
-//                action: 'Review Date Updated',
-//                oldReviewDate: oldReviewDate,
-//                newReviewDate: currentCard.reviewDate
-//            });
-
-            // Обновляем отображение
-            document.getElementById('dateReview').textContent = `${currentCard.reviewDate}`;
-            currentCard.date_review = dateReviewField.textContent;
-            await saveCard(currentCard);
-            renderCards(searchInput.value);
-            alert('Review date updated successfully!');
+        if (!newReviewDate) {
+            alert('Please enter a review date.');
+            return;
         }
+        console.log('New review date:', newReviewDate);
 
+        currentCard.date_review = newReviewDate;
+        console.log('review date:', currentCard.date_review);
+        await saveCard(currentCard);
+        renderCards(searchInput.value);
+        document.getElementById('dateReview').textContent = `Review date: ${currentCard.date_review}`;
+        alert('Review date updated successfully!');
     });
+
 
     filterForm.addEventListener('submit', async (event) => {
         event.preventDefault();
