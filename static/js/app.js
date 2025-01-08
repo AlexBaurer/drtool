@@ -17,6 +17,10 @@ document.addEventListener('DOMContentLoaded', async function () {
     const saveReviewDate = document.getElementById('saveReviewDate');
     const rightPanel = document.getElementById("rightPanel");
     const logWindow = document.getElementById("logWindow");
+    const sortByDate = document.getElementById("sortByDate");
+    const sortByAuthor = document.getElementById("sortByAuthor");
+    const sortByAlphabet = document.getElementById("sortByAlphabet");
+    const sortByOverdue = document.getElementById("sortByOverdue");
 
     let currentCard = null;
 
@@ -142,7 +146,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         currentCard = card;
         editableCardTitle.value = card.title;
         editableCardContent.value = card.content;
-        dateReviewField.textContent = `Review date: ${dateCutter(card.date_review)}`;
+        dateReviewField.textContent = `${dateCutter(card.date_review)}`;
         editableCardTitle.disabled = false;
         editableCardContent.disabled = false;
         saveCardButton.disabled = false;
@@ -194,7 +198,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         console.log('review date:', currentCard.date_review);
         await saveCard(currentCard);
         renderCards(searchInput.value);
-        document.getElementById('dateReview').textContent = `Review date: ${currentCard.date_review}`;
+        document.getElementById('dateReview').textContent = `${currentCard.date_review}`;
         alert('Review date updated successfully!');
     });
 
