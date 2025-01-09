@@ -111,9 +111,12 @@ document.addEventListener('DOMContentLoaded', async function () {
         return convDateRes;
     }
 
-    async function renderCards(filter = '') {
-        const cards = await fetchCards();
+    async function renderCards(filter = '', inputCards) {
+        const cards = inputCards || await fetchCards();
+
         console.log('API responseRC:', await fetch('/api/cards').then(res => res.json()));
+
+        console.log('cards:', cards);
 
         cardList.innerHTML = '';
         cards
@@ -259,33 +262,37 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     backLogButton.addEventListener("click", goBackLog);
 
-//    // Фильтрация карточек по просроченным
-//    document.getElementById('filterOverdue').addEventListener('click', function() {
-//        cards.sort((a, b) => {
-//            const aIsOverdue = a.reviewDate < currentDate;
-//            const bIsOverdue = b.reviewDate < currentDate;
-//            return (aIsOverdue === bIsOverdue) ? 0 : aIsOverdue ? -1 : 1;
-//        });
-//        renderCards(searchInput.value);
-//    });
-//
-//    // Фильтрация карточек по дате
-//    document.getElementById('filterDate').addEventListener('click', function() {
-//        cards.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
-//        renderCards(searchInput.value);
-//    });
-//
-//    // Фильтрация карточек по автору
-//    document.getElementById('filterAuthor').addEventListener('click', function() {
-//        cards.sort((a, b) => a.author.localeCompare(b.author));
-//        renderCards(searchInput.value);
-//    });
-//
-//    // Фильтрация карточек по алфавиту
-//    document.getElementById('filterAlphabet').addEventListener('click', function() {
-//        cards.sort((a, b) => a.title.localeCompare(b.title));
-//        renderCards(searchInput.value);
-//    });
+    // Фильтрация карточек по просроченным
+    sortByOverdue.addEventListener('click', async function() {
+        const cards = await fetchCards();
+        cards.sort((a, b) => {
+            const aIsOverdue = a.reviewDate < currentDate;
+            const bIsOverdue = b.reviewDate < currentDate;
+            return (aIsOverdue === bIsOverdue) ? 0 : aIsOverdue ? -1 : 1;
+        });
+        renderCards(searchInput.value, cards);
+    });
+
+    // Фильтрация карточек по дате
+    sortByDate.addEventListener('click', async function() {
+        const cards = await fetchCards();
+        cards.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+        renderCards(searchInput.value, cards);
+    });
+
+    // Фильтрация карточек по автору
+    sortByAuthor.addEventListener('click', async function() {
+        const cards = await fetchCards();
+        cards.sort((a, b) => a.author.localeCompare(b.author));
+        renderCards(searchInput.value, cards);
+    });
+
+    // Фильтрация карточек по алфавиту
+    sortByAlphabet.addEventListener('click', async function() {
+        const cards = await fetchCards();
+        cards.sort((a, b) => a.title.localeCompare(b.title));
+        renderCards(searchInput.value, cards);
+    });
 
     // Инициализация отображения карточек
     renderCards();
