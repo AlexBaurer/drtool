@@ -17,6 +17,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     const saveReviewDate = document.getElementById('saveReviewDate');
     const rightPanel = document.getElementById("rightPanel");
     const logWindow = document.getElementById("logWindow");
+    const logContent = document.getElementById("logContent");
     const sortByDate = document.getElementById("sortByDate");
     const sortByAuthor = document.getElementById("sortByAuthor");
     const sortByAlphabet = document.getElementById("sortByAlphabet");
@@ -24,29 +25,50 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     let currentCard = null;
 
-    const showLog = () => {
+    const showLog = async () => {
         logWindow.classList.add("show");
+
         try {
             // Запрос данных с бэкенда
-            const response = fetch('/api/logs');
+            const response = await fetch(`/api/logs?card_id=${currentCard.id}`);
             if (!response.ok) throw new Error(`Ошибка: ${response.statusText}`);
 
             const data = response.json();
+
             renderLog(data);
         } catch (error) {
             logContent.innerHTML = `<p class="text-danger">Не удалось загрузить данные: ${error.message}</p>`;
         }
     };
 
-    const renderLog = (data) => {
-    //TODO stop here
-        if (currentCard) {
-            if (currentCard.id = card.id) {
-                logContent.innerHTML = `
-                    <h3>${data.title}</h3>
-                    <p>${data.content}</p>
+    const renderLog = async (data) => {
+        logContent.innerHTML = ''; // Очищаем содержимое перед рендерингом новых данных
+
+        logs = await data
+        console.log('renderlogIn:', logs);
+
+        if (logs && logs.length > 0) {
+            logs.forEach(log => {
+                console.log('InLoop:', log);
+                const logEntry = document.createElement('div');
+                logEntry.className = 'log-entry border-bottom p-2 mb-2';
+
+                const action = log.log_content.action;
+                const data = log.log_content;
+
+                let logDetails = `
+                    <h4>Действие: ${action}</h4>
+                    <p><strong>Дата:</strong> ${new Date(data.updated_at || data.created_at).toLocaleString()}</p>
+                    <p><strong>Название:</strong> ${data.title || 'N/A'}</p>
+                    <p><strong>Содержание:</strong> ${data.content || 'N/A'}</p>
+                    <p><strong>Дата проверки:</strong> ${data.date_review || 'N/A'}</p>
                 `;
-            }
+
+                logEntry.innerHTML = logDetails;
+                logContent.appendChild(logEntry);
+            });
+        } else {
+            logContent.innerHTML = '<p class="text-muted">Нет доступных логов для этой карточки.</p>';
         }
     };
 

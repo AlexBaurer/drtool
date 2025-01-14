@@ -5,6 +5,26 @@ from app.db import Base
 from datetime import datetime
 
 
+class CardOrm(Base):
+    __tablename__ = "Cards"
+
+    id = Column(Integer, primary_key=True)
+    author = Column(String, nullable=False)
+    created_at = Column(DateTime, server_default=func.now())
+    updated_at = Column(DateTime, server_default=func.now(), onupdate=datetime.now)
+    title = Column(String, nullable=False)
+    content = Column(String, nullable=False)
+    date_review = Column(Date)
+
+
+class LogOrm(Base):
+    __tablename__ = "Logs"
+
+    id = Column(Integer, primary_key=True)
+    card_id = Column(ForeignKey("Cards.id"), nullable=False)
+    log_content = Column(JSONB, nullable=False)
+
+
 # class CardOrm(Base):
 #     __tablename__ = "Cards"
 #
@@ -22,23 +42,3 @@ from datetime import datetime
 #
 #     id: Mapped[int_pk]
 #     log_content: Mapped[dict] = mapped_column(JSONB, nullable=False)
-
-
-class CardOrm(Base):
-    __tablename__ = "Cards"
-
-    id = Column(Integer, primary_key=True)
-    author = Column(String, nullable=False)
-    created_at = Column(DateTime, server_default=func.now())
-    updated_at = Column(DateTime, server_default=func.now(), onupdate=datetime.now)
-    title = Column(String, nullable=False)
-    content = Column(String, nullable=False)
-    date_review = Column(Date)
-
-
-class Log(Base):
-    __tablename__ = "Logs"
-
-    id = Column(Integer, primary_key=True)
-    card_id = Column(ForeignKey("Cards.id"), nullable=False)
-    log_content = Column(JSONB, nullable=False)

@@ -138,6 +138,8 @@ body {
     box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
     transition: right 0.3s ease; /* Анимация появления */
     z-index: 1050; /* Поверх других элементов */
+    display: flex;
+    flex-direction: column;
 }
 
 /* Видимая панель */
@@ -145,3 +147,12 @@ body {
     right: 0; /* Показываем панель, выдвигая её */
 }
 
+#log-content {
+    overflow-y: auto; /* Включить вертикальный скролл */
+    flex-grow: 1; /* Растянуть контент на доступное пространство */
+    padding-bottom: 1rem; /* Добавить отступ для скроллбара */
+}
+
+#backLogButton {
+    margin-top: auto; /* Отступ сверху */
+}

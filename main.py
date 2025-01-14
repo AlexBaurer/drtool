@@ -5,9 +5,11 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 from datetime import date, datetime
+
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.exc import SQLAlchemyError
-from app.cards.models import CardOrm
+from app.cards.models import CardOrm, LogOrm
 from app.db import async_session_maker
 
 app = FastAPI()
@@ -27,6 +29,18 @@ class Card(NewCard):
 
     class Config:
         orm_mode=True
+
+class LogNew(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    card_id: int
+    log_content: dict
+
+class Log(LogNew):
+    id: int
+
+    class Config:
+        orm_mode = True
 
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -72,6 +86,26 @@ async def add_card(card):
         print(error)
     return Card.from_orm(card)
 
+async def add_log(log):
+    try:
+        async with async_session_maker() as session:
+            session.add(log)
+            await session.commit()
+    except SQLAlchemyError as e:
+        error = str(e.__cause__)
+        print(error)
+    return Log.from_orm(log)
+
+async def get_logs_by_card_id(card_id):
+    try:
+        async with async_session_maker() as session:
+            q = select(LogOrm).filter_by(card_id=card_id)
+            res = await session.execute(q)
+            r = res.scalars().all()
+        return [Log.from_orm(log) for log in r]
+    except:
+        pass
+
 
 # @app.get("/api/cards", response_model=List[Card])
 # async def get_cards():
@@ -82,15 +116,43 @@ async def add_card(card):
 async def create_card(card: NewCard):
     card = CardOrm(title=card.title, content=card.content, date_review=card.date_review,
          created_at=datetime.now(), updated_at=datetime.now(), author='kek')
+
     await add_card(card)
-    logs.append(card)
+
+    # log_entry = LogNew(card_id=card.id, log_content={
+    #     'action': 'create',
+    #     'title': card.title,
+    #     'content': card.content,
+    #     'date_review': card.date_review.isoformat(),
+    #     'created_at': card.created_at.isoformat(),
+    #     'updated_at': card.updated_at.isoformat(),
+    #     'author': card.author
+    # })
+    #
+    # log_orm = LogOrm(**log_entry.dict())
+    # await add_log(log_orm)
+
     return Card.from_orm(card)
 
 @app.put("/api/cards/{card_id}")
 async def update_card(card_id: int, updated_card: Card):
-    print(card_id)
+
     card = await get_card_by_id(card_id)
-    print(card)
+
+    log_entry = LogNew(
+        card_id=card.id,
+        log_content={
+            'action': 'update',
+            'title': card.title,
+            'content': card.content,
+            'date_review': card.date_review.isoformat() if card.date_review else None,
+            'updated_at': card.updated_at.isoformat()
+        }
+    )
+
+    log_orm = LogOrm(**log_entry.dict())
+    await add_log(log_orm)
+
     if card.id == card_id:
         card.title = updated_card.title
         card.content = updated_card.content
@@ -105,9 +167,11 @@ async def update_card(card_id: int, updated_card: Card):
 async def read_root(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
-@app.get("/api/logs", response_model=List[Card])
-async def get_logs():
-    return logs
+@app.get("/api/logs", response_model=List[Log])
+async def get_logs(card_id: int):
+    logs_by_id = await get_logs_by_card_id(card_id)
+    print("logsss", logs_by_id[::-1])
+    return logs_by_id[::-1]
 
 @app.get("/api/cards", response_model=List[Card])
 async def filter_cards(
