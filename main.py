@@ -48,12 +48,6 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 # Инициализация Jinja2
 templates = Jinja2Templates(directory="templates")
 
-# Данные временно хранятся в памяти
-# cards = [
-#     Card(id=0, title="T1", content="c1", created_at=datetime.now(), updated_at=datetime.now(), date_review=datetime.now(), author="au1"),
-# ]
-
-logs = []
 
 async def get_all_cards_from_db():
     global cards

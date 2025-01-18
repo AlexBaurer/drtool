@@ -24,6 +24,12 @@ class LogOrm(Base):
     card_id = Column(ForeignKey("Cards.id"), nullable=False)
     log_content = Column(JSONB, nullable=False)
 
+class User(Base):
+    id = Column(Integer, primary_key=True)
+    google_id = Column(String, unique=True)
+    email = Column(String, unique=True)
+    name = Column(String)
+
 
 # class CardOrm(Base):
 #     __tablename__ = "Cards"

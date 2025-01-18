@@ -8,3 +8,5 @@ alembic
 asyncpg
 sqlalchemy
 pydantic-settings
+authlib
+httpx

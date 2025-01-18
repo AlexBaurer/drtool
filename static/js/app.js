@@ -23,6 +23,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     const sortByAlphabet = document.getElementById("sortByAlphabet");
     const sortByOverdue = document.getElementById("sortByOverdue");
 
+
     let currentCard = null;
 
     const showLog = async () => {
