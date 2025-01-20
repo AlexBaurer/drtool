@@ -13,3 +13,4 @@ httpx
 starlette
 google-auth
 requests
+python-dotenv

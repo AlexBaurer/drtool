@@ -6,14 +6,21 @@ from google.auth.transport import requests
 from starlette.config import Config
 from starlette.requests import Request
 import httpx
+from dotenv import load_dotenv
+import os
+from app.db import async_session_maker
+from sqlalchemy.exc import SQLAlchemyError
+from app.cards.models import User
+
+load_dotenv()
 
 # Создаем роутер
 router = APIRouter(prefix="/auth")
 
 # Настройка OAuth
 config_data = {
-    "GOOGLE_CLIENT_ID": "144136712047-sc4icsbs627r8kgflbosrh17udfsmhqn.apps.googleusercontent.com",
-    "GOOGLE_CLIENT_SECRET": "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",
+    "GOOGLE_CLIENT_ID": os.getenv("GOOGLE_CLIENT_ID"),
+    "GOOGLE_CLIENT_SECRET": os.getenv("GOOGLE_CLIENT_SECRET"),
     "GOOGLE_REDIRECT_URI": "http://localhost:8000/auth/google/callback",
 }
 config = Config(environ=config_data)
@@ -67,7 +74,21 @@ async def google_auth_callback(code: str, request: Request):
             'given_name': id_info['given_name'],
             'family_name': id_info['family_name']
         }
-    # Здесь можно сохранить пользователя в сессии или базе данных
+        # Добавление юзера в бд
+        bd_user = User(
+            email=id_info['email'],
+            name=id_info['name'],
+            full_real_name=f'{id_info['family_name']} {id_info['given_name']}',
+            auth_method='google'
+        )
+        try:
+            async with async_session_maker() as session:
+                session.add(bd_user)
+                await session.commit()
+        except SQLAlchemyError as e:
+            error = str(e.__cause__)
+            print(error)
+
         request.session['user'] = user
         return RedirectResponse(url="/")
 

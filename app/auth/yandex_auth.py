@@ -4,13 +4,20 @@ from authlib.integrations.starlette_client import OAuth
 from starlette.config import Config
 from starlette.requests import Request
 import httpx
+from dotenv import load_dotenv
+import os
+from app.db import async_session_maker
+from sqlalchemy.exc import SQLAlchemyError
+from app.cards.models import User
+
+load_dotenv()
 
 router = APIRouter(prefix="/auth")
 
 # Настройка OAuth для Yandex
 config_data = {
-    "YANDEX_CLIENT_ID": "9b127c8129bc4686ba8060304d3fdb66",
-    "YANDEX_CLIENT_SECRET": "a240c4918b0b45f3bc6087e0551a9157",
+    "YANDEX_CLIENT_ID": os.getenv("YANDEX_CLIENT_ID"),
+    "YANDEX_CLIENT_SECRET": os.getenv("YANDEX_CLIENT_SECRET"),
     "YANDEX_REDIRECT_URI": "http://localhost:8000/auth/ya/callback",
 }
 config = Config(environ=config_data)
@@ -78,6 +85,22 @@ async def yandex_callback(request: Request):
 
         # Сохраняем пользователя в сессии
         request.session['user'] = userinfo
+        print('userinfoJson____', userinfo)
+        # Добавление юзера в бд
+        bd_user = User(
+            email=userinfo['default_email'],
+            name=userinfo['login'],
+            full_real_name=userinfo['real_name'],
+            auth_method='yandex'
+        )
+        try:
+            async with async_session_maker() as session:
+                session.add(bd_user)
+                await session.commit()
+        except SQLAlchemyError as e:
+            error = str(e.__cause__)
+            print(error)
+
         return RedirectResponse(url="/")
 
     except Exception as e:
