@@ -1,18 +1,33 @@
 from fastapi import FastAPI, HTTPException, Request, Query
-from pydantic import BaseModel, ConfigDict
-from typing import List
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
-from datetime import date, datetime
 
-from sqlalchemy.ext.asyncio import AsyncSession
+from datetime import datetime
+from pydantic import BaseModel, ConfigDict
+from typing import List
+
 from sqlalchemy.future import select
 from sqlalchemy.exc import SQLAlchemyError
+
+from starlette.middleware.sessions import SessionMiddleware
+
 from app.cards.models import CardOrm, LogOrm
 from app.db import async_session_maker
+from app.auth.google_auth import router as google_auth_router
+from app.auth.yandex_auth import router as yandex_auth_router
 
 app = FastAPI()
+
+# Добавляем middleware для работы с сессиями
+app.add_middleware(SessionMiddleware,
+                   secret_key="your-secret-key-32-characters-long",
+                   https_only=False,
+                   same_site="lax",)
+
+# Подключаем роутер
+app.include_router(google_auth_router)
+app.include_router(yandex_auth_router)
 
 class NewCard(BaseModel):
     model_config = ConfigDict(from_attributes=True)
@@ -194,3 +209,15 @@ async def filter_cards(
         filtered_cards = [i for i in f_cards]
 
     return filtered_cards
+
+@app.get("/test-session")
+async def test_session(request: Request):
+    # Сохраняем значение в сессии
+    request.session['test_key'] = 'test_value'
+    return {"message": "Session value set"}
+
+@app.get("/get-session")
+async def get_session(request: Request):
+    # Получаем значение из сессии
+    test_value = request.session.get('test_key')
+    return {"test_value": test_value}
