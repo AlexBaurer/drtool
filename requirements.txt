@@ -11,3 +11,5 @@ pydantic-settings
 authlib
 httpx
 starlette
+google-auth
+requests
