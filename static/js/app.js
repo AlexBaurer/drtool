@@ -166,7 +166,13 @@ document.addEventListener('DOMContentLoaded', async function () {
             });
     }
 
-    function selectCard(card) {
+    async function checkUserSession() {
+        const response = await fetch('/api/current-user');
+        const data = await response.json();
+        return data.is_authenticated;
+    }
+
+    async function selectCard(card) {
         const formattedDateCreatedAt = dateCutter(card.created_at);
         const formattedDateUpdatedAt = dateCutter(card.updated_at);
         currentCard = card;
@@ -175,7 +181,8 @@ document.addEventListener('DOMContentLoaded', async function () {
         dateReviewField.textContent = `${dateCutter(card.date_review)}`;
         editableCardTitle.disabled = false;
         editableCardContent.disabled = false;
-        saveCardButton.disabled = false;
+        const isAuthenticated = await checkUserSession();
+        saveCardButton.disabled = !isAuthenticated;
         cardMetadata.textContent = `Created: ${formattedDateCreatedAt} | Last Updated: ${formattedDateUpdatedAt} | Author: ${card.author}`;
     }
 

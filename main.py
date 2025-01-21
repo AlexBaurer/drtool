@@ -20,6 +20,7 @@ from app.auth.yandex_auth import router as yandex_auth_router
 app = FastAPI()
 
 # Добавляем middleware для работы с сессиями
+#TODO make https_only True
 app.add_middleware(SessionMiddleware,
                    secret_key="your-secret-key-32-characters-long",
                    https_only=False,
@@ -210,14 +211,9 @@ async def filter_cards(
 
     return filtered_cards
 
-@app.get("/test-session")
-async def test_session(request: Request):
-    # Сохраняем значение в сессии
-    request.session['test_key'] = 'test_value'
-    return {"message": "Session value set"}
+from fastapi import Request
 
-@app.get("/get-session")
-async def get_session(request: Request):
-    # Получаем значение из сессии
-    test_value = request.session.get('test_key')
-    return {"test_value": test_value}
+@app.get("/api/current-user")
+async def get_current_user(request: Request):
+    user = request.session.get('user')
+    return {"is_authenticated": bool(user)}
