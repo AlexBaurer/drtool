@@ -23,6 +23,7 @@ class LogOrm(Base):
     id = Column(Integer, primary_key=True)
     card_id = Column(ForeignKey("Cards.id"), nullable=False)
     log_content = Column(JSONB, nullable=False)
+    update_author = Column(String)
 
 class User(Base):
     id = Column(Integer, primary_key=True)

@@ -51,6 +51,7 @@ class LogNew(BaseModel):
 
     card_id: int
     log_content: dict
+    update_author: str
 
 class Log(LogNew):
     id: int
@@ -123,9 +124,10 @@ async def get_logs_by_card_id(card_id):
 #     return cards
 
 @app.post("/api/cards", response_model=Card)
-async def create_card(card: NewCard):
+async def create_card(card: NewCard, request: Request):
     card = CardOrm(title=card.title, content=card.content, date_review=card.date_review,
          created_at=datetime.now(), updated_at=datetime.now(), author='kek')
+    card.author = request.session.get('user')['name']
 
     await add_card(card)
 
@@ -145,7 +147,7 @@ async def create_card(card: NewCard):
     return Card.from_orm(card)
 
 @app.put("/api/cards/{card_id}")
-async def update_card(card_id: int, updated_card: Card):
+async def update_card(card_id: int, updated_card: Card, request: Request):
 
     card = await get_card_by_id(card_id)
 
@@ -156,8 +158,10 @@ async def update_card(card_id: int, updated_card: Card):
             'title': card.title,
             'content': card.content,
             'date_review': card.date_review.isoformat() if card.date_review else None,
-            'updated_at': card.updated_at.isoformat()
-        }
+            'updated_at': card.updated_at.isoformat(),
+            'update_author': request.session.get('user')['name']
+        },
+        update_author=request.session.get('user')['name'],
     )
 
     log_orm = LogOrm(**log_entry.dict())
@@ -216,4 +220,5 @@ from fastapi import Request
 @app.get("/api/current-user")
 async def get_current_user(request: Request):
     user = request.session.get('user')
+    print(user)
     return {"is_authenticated": bool(user)}

@@ -67,12 +67,10 @@ async def google_auth_callback(code: str, request: Request):
 
     try:
         id_info = id_token.verify_oauth2_token(id_token_value, requests.Request(), config_data["GOOGLE_CLIENT_ID"])
-        user = {
+        user_session = {
             'email': id_info['email'],
             'name': id_info['name'],
-            'picture': id_info['picture'],
-            'given_name': id_info['given_name'],
-            'family_name': id_info['family_name']
+            'auth_method': 'google'
         }
         # Добавление юзера в бд
         bd_user = User(
@@ -89,7 +87,7 @@ async def google_auth_callback(code: str, request: Request):
             error = str(e.__cause__)
             print(error)
 
-        request.session['user'] = user
+        request.session['user'] = user_session
         return RedirectResponse(url="/")
 
     except ValueError as e:

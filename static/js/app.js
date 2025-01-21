@@ -56,13 +56,14 @@ document.addEventListener('DOMContentLoaded', async function () {
 
                 const action = log.log_content.action;
                 const data = log.log_content;
+                const author = log.update_author;
 
                 let logDetails = `
-                    <h4>Действие: ${action}</h4>
-                    <p><strong>Дата:</strong> ${new Date(data.updated_at || data.created_at).toLocaleString()}</p>
-                    <p><strong>Название:</strong> ${data.title || 'N/A'}</p>
-                    <p><strong>Содержание:</strong> ${data.content || 'N/A'}</p>
-                    <p><strong>Дата проверки:</strong> ${data.date_review || 'N/A'}</p>
+                    <h4>Date:</strong> ${new Date(data.updated_at || data.created_at).toLocaleString()}</h4>
+                    <p><strong>Title:</strong> ${data.title || 'N/A'}</p>
+                    <p><strong>Content:</strong> ${data.content || 'N/A'}</p>
+                    <p><strong>Review date:</strong> ${data.date_review || 'N/A'}</p>
+                    <p><strong>Update author:</strong> ${author || 'N/A'}</p>
                 `;
 
                 logEntry.innerHTML = logDetails;

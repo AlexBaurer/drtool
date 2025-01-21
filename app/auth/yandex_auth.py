@@ -86,6 +86,11 @@ async def yandex_callback(request: Request):
         # Сохраняем пользователя в сессии
         request.session['user'] = userinfo
         print('userinfoJson____', userinfo)
+        user_session = {
+            'email': userinfo['default_email'],
+            'name': userinfo['login'],
+            'auth_method': 'yandex'
+        }
         # Добавление юзера в бд
         bd_user = User(
             email=userinfo['default_email'],
@@ -93,6 +98,8 @@ async def yandex_callback(request: Request):
             full_real_name=userinfo['real_name'],
             auth_method='yandex'
         )
+        request.session['user'] = user_session
+        print('userinfo____', user_session)
         try:
             async with async_session_maker() as session:
                 session.add(bd_user)
